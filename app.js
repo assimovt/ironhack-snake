@@ -102,6 +102,13 @@ Game.prototype.assignControlsToKeys = function() {
       case 39: // arrow right
         this.snake.goRight();
         break;
+      case 80: // p pause
+        if (this.intervalId) {
+          this.stop();
+        } else {
+          this.start();
+        }
+        break;
     }
   }.bind(this));
 };
@@ -122,6 +129,13 @@ Game.prototype.clearSnake = function() {
 Game.prototype.start = function() {
   if (!this.intervalId) {
     this.intervalId = setInterval(this.update.bind(this), 100);
+  }
+};
+
+Game.prototype.stop = function() {
+  if (this.intervalId) {
+    clearInterval(this.intervalId);
+    this.intervalId = undefined;
   }
 };
 
