@@ -10,14 +10,14 @@ function Snake() {
   ];
 }
 
-Snake.prototype.move = function() {
+Snake.prototype.move = function(maxRows, maxColumns) {
   var head = this.body[0];
 
   switch(this.direction) {
     case 'left':
       this.body.unshift({
         row: head.row,
-        column: (head.column - 1 + 50) %  50
+        column: (head.column - 1 + maxColumns) %  maxColumns
       });
       break;
 
@@ -25,20 +25,20 @@ Snake.prototype.move = function() {
     case 'right':
       this.body.unshift({
         row: head.row,
-        column: (head.column + 1) % 50
+        column: (head.column + 1) % maxColumns
       });
       break;
 
     case 'up':
       this.body.unshift({
-        row: (head.row - 1 + 50) % 50,
+        row: (head.row - 1 + maxRows) % maxRows,
         column: head.column
       });
       break;
 
     case 'down':
       this.body.unshift({
-        row: (head.row + 1) % 50,
+        row: (head.row + 1) % maxRows,
         column: head.column
       });
       break;
@@ -93,12 +93,15 @@ Snake.prototype.hasEatenItself = function() {
   });
 };
 
-function Game() {
-  this.snake = new Snake();
+function Game(options) {
+  this.rows = options.rows;
+  this.columns = options.columns;
+  this.snake = options.snake;
+
   this.food = undefined;
 
-  for (var row = 0; row < 50; row++) {
-    for (var col = 0; col < 50; col++) {
+  for (var row = 0; row < this.rows; row++) {
+    for (var col = 0; col < this.columns; col++) {
       $('.container').append($('<div>')
         .addClass('cell')
         .attr('data-row', row)
@@ -151,8 +154,8 @@ Game.prototype.drawSnake = function() {
 Game.prototype.generateFood = function() {
   do {
     this.food = {
-      row: Math.floor(Math.random() * 50),
-      column: Math.floor(Math.random() * 50)
+      row: Math.floor(Math.random() * this.rows),
+      column: Math.floor(Math.random() * this.columns)
     };
   } while (this.snake.collidesWith(this.food));
 };
@@ -186,7 +189,7 @@ Game.prototype.stop = function() {
 };
 
 Game.prototype.update = function() {
-  this.snake.move();
+  this.snake.move(this.rows, this.columns);
 
   if (this.snake.hasEatenFood(this.food)) {
     this.snake.grow();
@@ -207,6 +210,10 @@ Game.prototype.update = function() {
 var game;
 
 $(document).ready(function() {
-  game = new Game();
+  game = new Game({
+    rows: 50,
+    columns: 50,
+    snake: new Snake()
+  });
   game.start();
 });
