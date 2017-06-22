@@ -43,7 +43,7 @@ Snake.prototype.move = function() {
       });
       break;
   }
-  this.body.pop();
+  this.tail = this.body.pop();
 };
 
 Snake.prototype.goLeft = function() {
@@ -74,6 +74,17 @@ Snake.prototype.collidesWith = function(pos) {
   return this.body.some(function(el) {
     return el.row == pos.row && el.column == pos.column;
   });
+};
+
+Snake.prototype.hasEatenFood = function(foodPosition) {
+  return this.body[0].row === foodPosition.row && this.body[0].column === foodPosition.column;
+};
+
+Snake.prototype.grow = function() {
+  if (this.tail) {
+    this.body.push(this.tail);
+    this.tail = undefined;
+  }
 };
 
 function Game() {
@@ -150,6 +161,11 @@ Game.prototype.clearSnake = function() {
   $('.snake').removeClass('snake');
 };
 
+Game.prototype.clearFood = function() {
+  $('.food').removeClass('food');
+  this.food = undefined;
+};
+
 Game.prototype.start = function() {
   if (!this.intervalId) {
     this.intervalId = setInterval(this.update.bind(this), 100);
@@ -165,6 +181,14 @@ Game.prototype.stop = function() {
 
 Game.prototype.update = function() {
   this.snake.move();
+
+  if (this.snake.hasEatenFood(this.food)) {
+    this.snake.grow();
+    this.clearFood();
+    this.generateFood();
+    this.drawFood();
+  }
+
   this.clearSnake();
   this.drawSnake();
 };
