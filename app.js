@@ -70,8 +70,15 @@ Snake.prototype.goDown = function() {
   }
 };
 
+Snake.prototype.collidesWith = function(pos) {
+  return this.body.some(function(el) {
+    return el.row == pos.row && el.column == pos.column;
+  });
+};
+
 function Game() {
   this.snake = new Snake();
+  this.food = undefined;
 
   for (var row = 0; row < 50; row++) {
     for (var col = 0; col < 50; col++) {
@@ -83,6 +90,8 @@ function Game() {
     }
   }
 
+  this.generateFood();
+  this.drawFood();
   this.drawSnake();
   this.assignControlsToKeys();
 }
@@ -120,6 +129,21 @@ Game.prototype.drawSnake = function() {
 
     $(selector).addClass('snake');
   });
+};
+
+Game.prototype.generateFood = function() {
+  do {
+    this.food = {
+      row: Math.floor(Math.random() * 50),
+      column: Math.floor(Math.random() * 50)
+    };
+  } while (this.snake.collidesWith(this.food));
+};
+
+Game.prototype.drawFood = function() {
+  var selector = '[data-row=' + this.food.row + ']' +
+                 '[data-col=' + this.food.column + ']';
+  $(selector).addClass('food');
 };
 
 Game.prototype.clearSnake = function() {
