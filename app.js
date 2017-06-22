@@ -75,6 +75,12 @@ Game.prototype.clearSnake = function() {
   $('.snake').removeClass('snake');
 };
 
+Game.prototype.start = function() {
+  if (!this.intervalId) {
+    this.intervalId = setInterval(this.update.bind(this), 100);
+  }
+};
+
 Game.prototype.update = function() {
   this.snake.move();
   this.clearSnake();
@@ -85,4 +91,5 @@ var game;
 
 $(document).ready(function() {
   game = new Game();
+  game.start();
 });
