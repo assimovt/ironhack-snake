@@ -15,13 +15,26 @@ function Game(options) {
     }
   }
 
-  this.generateFood();
-  this.drawFood();
-  this.drawSnake();
-  this.assignControlsToKeys();
+  this._generateFood();
+  this._drawFood();
+  this._drawSnake();
+  this._assignControlsToKeys();
 }
 
-Game.prototype.assignControlsToKeys = function() {
+Game.prototype.start = function() {
+  if (!this.intervalId) {
+    this.intervalId = setInterval(this._update.bind(this), 100);
+  }
+};
+
+Game.prototype.stop = function() {
+  if (this.intervalId) {
+    clearInterval(this.intervalId);
+    this.intervalId = undefined;
+  }
+};
+
+Game.prototype._assignControlsToKeys = function() {
   $('body').on('keydown', function(e) {
     switch (e.keyCode) {
       case 38: // arrow up
@@ -47,7 +60,7 @@ Game.prototype.assignControlsToKeys = function() {
   }.bind(this));
 };
 
-Game.prototype.drawSnake = function() {
+Game.prototype._drawSnake = function() {
   this.snake.body.forEach(function(position, index) {
     var selector = '[data-row=' + position.row + ']' +
                    '[data-col=' + position.column + ']';
@@ -56,7 +69,7 @@ Game.prototype.drawSnake = function() {
   });
 };
 
-Game.prototype.generateFood = function() {
+Game.prototype._generateFood = function() {
   do {
     this.food = {
       row: Math.floor(Math.random() * this.rows),
@@ -65,42 +78,29 @@ Game.prototype.generateFood = function() {
   } while (this.snake.collidesWith(this.food));
 };
 
-Game.prototype.drawFood = function() {
+Game.prototype._drawFood = function() {
   var selector = '[data-row=' + this.food.row + ']' +
                  '[data-col=' + this.food.column + ']';
   $(selector).addClass('food');
 };
 
-Game.prototype.clearSnake = function() {
+Game.prototype._clearSnake = function() {
   $('.snake').removeClass('snake');
 };
 
-Game.prototype.clearFood = function() {
+Game.prototype._clearFood = function() {
   $('.food').removeClass('food');
   this.food = undefined;
 };
 
-Game.prototype.start = function() {
-  if (!this.intervalId) {
-    this.intervalId = setInterval(this.update.bind(this), 100);
-  }
-};
-
-Game.prototype.stop = function() {
-  if (this.intervalId) {
-    clearInterval(this.intervalId);
-    this.intervalId = undefined;
-  }
-};
-
-Game.prototype.update = function() {
+Game.prototype._update = function() {
   this.snake.move(this.rows, this.columns);
 
   if (this.snake.hasEatenFood(this.food)) {
     this.snake.grow();
-    this.clearFood();
-    this.generateFood();
-    this.drawFood();
+    this._clearFood();
+    this._generateFood();
+    this._drawFood();
   }
 
   if (this.snake.hasEatenItself()) {
@@ -108,6 +108,6 @@ Game.prototype.update = function() {
     this.stop();
   }
 
-  this.clearSnake();
-  this.drawSnake();
+  this._clearSnake();
+  this._drawSnake();
 };
