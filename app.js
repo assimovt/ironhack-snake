@@ -87,6 +87,12 @@ Snake.prototype.grow = function() {
   }
 };
 
+Snake.prototype.hasEatenItself = function() {
+  return this.body.some(function(element, index, array) {
+    return (element.row === array[0].row && element.column === array[0].column && index !== 0);
+  });
+};
+
 function Game() {
   this.snake = new Snake();
   this.food = undefined;
@@ -187,6 +193,11 @@ Game.prototype.update = function() {
     this.clearFood();
     this.generateFood();
     this.drawFood();
+  }
+
+  if (this.snake.hasEatenItself()) {
+    alert('Game over 👽');
+    this.stop();
   }
 
   this.clearSnake();
